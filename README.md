@@ -11,4 +11,5 @@
 | [Vulkan® 1.3.209 - A Specification](https://www.khronos.org/registry/vulkan/specs/1.3-extensions/html/index.html) |                                                              | Khronos官方发布的vulkan规范说明文档。 |
 | [Vulkan-Samples](https://github.com/KhronosGroup/Vulkan-Samples) | \                                                            | Vulkan官方软件案例，在github上开源。  |
 | [Vulkan-Guide](https://github.com/KhronosGroup/Vulkan-Guide) |                                                              | Vulkan学习指导材料                    |
-| [vulkan-tutorial](https://vulkan-tutorial.com/)              | [中文翻译版本](https://gitee.com/firsttriangle/vulkan/blob/master/book/VulkanTutorial.html) | vulkan使用教程                        |
+| [vulkan-tutorial](https://vulkan-tutorial.com/)              | [中文翻译版本](https://gitee.com/firsttriangle/vulkan/raw/master/book/VulkanTutorial.html) | vulkan使用教程                        |
+
