@@ -1,0 +1,786 @@
+<html>
+  <head>
+	  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>i5ting_ztree_toc:Vulkan Tutorial</title>
+		<link href="toc/style/github-bf51422f4bb36427d391e4b75a1daa083c2d840e.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/style/github2-d731afd4f624c99a4b19ad69f3083cd6d02b81d5.css" media="all" rel="stylesheet" type="text/css"/>
+		<link href="toc/css/zTreeStyle/zTreeStyle.css" media="all" rel="stylesheet" type="text/css"/>
+	  <style>
+		pre {
+		    counter-reset: line-numbering;
+		    border: solid 1px #d9d9d9;
+		    border-radius: 0;
+		    background: #fff;
+		    padding: 0;
+		    line-height: 23px;
+		    margin-bottom: 30px;
+		    white-space: pre;
+		    overflow-x: auto;
+		    word-break: inherit;
+		    word-wrap: inherit;
+		}
+
+		pre a::before {
+		  content: counter(line-numbering);
+		  counter-increment: line-numbering;
+		  padding-right: 1em; /* space after numbers */
+		  width: 25px;
+		  text-align: right;
+		  opacity: 0.7;
+		  display: inline-block;
+		  color: #aaa;
+		  background: #eee;
+		  margin-right: 16px;
+		  padding: 2px 10px;
+		  font-size: 13px;
+		  -webkit-touch-callout: none;
+		  -webkit-user-select: none;
+		  -khtml-user-select: none;
+		  -moz-user-select: none;
+		  -ms-user-select: none;
+		  user-select: none;
+		}
+
+		pre a:first-of-type::before {
+		  padding-top: 10px;
+		}
+
+		pre a:last-of-type::before {
+		  padding-bottom: 10px;
+		}
+
+		pre a:only-of-type::before {
+		  padding: 10px;
+		}
+
+		.highlight { background-color: #ffffcc } /* RIGHT */
+		</style>
+  </head>
+  <body>
+	  <div>
+				<div style='width:25%;'>
+						<ul id="tree" class="ztree" style='width:100%'>
+
+						</ul>
+				</div>
+        <div id='readme' style='width:70%;margin-left:20%;'>
+          	<article class='markdown-body'>
+            	<h1 id="-">简介</h1>
+<blockquote>
+<p>本文档是对<a href="https://vulkan-tutorial.com/">Vulkan Tutorial</a>教程的翻译，不作为商业用途。如有涉及侵权，请联系<a href="mailto:hangliebe@163.com">hangliebe@163.com</a>进行删除。</p>
+<p>建议英文好的朋友直接读原文档：<a href="https://vulkan-tutorial.com/">https://vulkan-tutorial.com/</a></p>
+<p>翻译人员：<a href="https://hangliebe.com/about/">占航</a></p>
+</blockquote>
+<p><a href="# 关于我们">关于我们</a></p>
+<p><a href="# 电子书">电子书</a></p>
+<p><a href="# 教程结构">教程结构</a></p>
+<h2 id="-">关于我们</h2>
+<p>本教程将教你使用Vulkan图形和计算API的基础知识。<a href="https://www.khronos.org/vulkan/">Vulkan</a>是<a href="https://www.khronos.org/">Khronos集团</a>（以OpenGL闻名）推出的新API，它为现代图形卡提供了一个更好的抽象。这个新的接口允许你更好地描述你的应用程序打算做什么，与现有的API如<a href="https://en.wikipedia.org/wiki/OpenGL">OpenGL</a>和<a href="https://en.wikipedia.org/wiki/Direct3D">Direct3D</a>相比，这可能会导致更好的性能和更少的令人惊讶的驱动行为。Vulkan背后的想法与<a href="https://en.wikipedia.org/wiki/Direct3D#Direct3D_12">Direct3D 12</a>和<a href="https://en.wikipedia.org/wiki/Metal_(API">Metal</a>)的想法相似，但Vulkan的优势是完全跨平台，允许你同时为Windows、Linux和Android开发。</p>
+<p>然而，你为这些好处付出的代价是，你必须与一个明显更冗长的API合作。与图形API相关的每个细节都需要由你的应用程序从头开始设置，包括初始帧缓冲区的创建和缓冲区和纹理图像等对象的内存管理。图形驱动会少做很多工作，这意味着你必须在你的应用程序中做更多的工作以确保正确的行为。</p>
+<p>这里的启示是，Vulkan并不适合所有人。它的目标是那些热衷于高性能计算机图形的程序员，并且愿意投入一些工作。如果你对游戏开发更感兴趣，而不是对计算机图形感兴趣，那么你可能希望坚持使用OpenGL或Direct3D，它们不会在短期内被废弃而支持Vulkan。另一个选择是使用像<a href="https://en.wikipedia.org/wiki/Unreal_Engine#Unreal_Engine_4">虚幻引擎</a>或<a href="https://en.wikipedia.org/wiki/Unity_(game_engine">Unity</a>)这样的引擎，它将能够使用Vulkan，同时向你暴露一个更高层次的API。</p>
+<p>说完这些，让我们来介绍一下遵循本教程的一些先决条件。</p>
+<ul>
+<li>与Vulkan兼容的显卡和驱动程序（NVIDIA、AMD、Intel、Apple Silicon（或Apple M1））。</li>
+<li>有C++的经验（熟悉RAII、初始化器列表）。</li>
+<li>一个对C++17特性有适当支持的编译器（Visual Studio 2017+，GCC 7+，或Clang 5+）。</li>
+<li>有一些现有的3D计算机图形的经验</li>
+</ul>
+<p>本教程不会假设你有OpenGL或Direct3D概念的知识，但它确实要求你了解3D计算机图形的基础知识。例如，它不会解释透视投影背后的数学知识。请参阅这本在线书籍，了解关于计算机图形概念的精彩介绍。其他一些很好的计算机图形学资源有:</p>
+<ul>
+<li><a href="https://github.com/RayTracing/raytracing.github.io">Ray tracing in one weekend</a></li>
+<li><a href="http://www.pbr-book.org/">Physically Based Rendering book</a></li>
+<li>在开源的<a href="https://github.com/Novum/vkQuake">Quake</a>和<a href="https://github.com/DustinHLand/vkDOOM3">DOOM</a> 3中，Vulkan被用在一个真正的引擎中。</li>
+</ul>
+<p>如果你愿意，你可以用C语言代替C++，但你必须使用不同的线性代数库，而且在代码结构方面你要靠自己了。我们将使用C++的特性，如类和RAII来组织逻辑和资源寿命。本教程还有一个可供Rust开发者使用的替代版本。</p>
+<p>为了让使用其他编程语言的开发者更容易跟上，并获得一些基础API的经验，我们将使用原始的C语言API来与Vulkan合作。然而，如果你使用的是C++，你可能更喜欢使用较新的<a href="https://github.com/KhronosGroup/Vulkan-Hpp">Vulkan-Hpp</a>绑定，它可以抽象出一些杂乱的工作并有助于防止某些类别的错误。</p>
+<h2 id="-">电子书</h2>
+<p>如果你喜欢以电子书的形式阅读本教程，那么你可以在这里下载EPUB或PDF版本。</p>
+<p><a href="https://raw.githubusercontent.com/Overv/VulkanTutorial/master/ebook/Vulkan%20Tutorial%20en.epub">EPUB</a>
+<a href="https://raw.githubusercontent.com/Overv/VulkanTutorial/master/ebook/Vulkan%20Tutorial%20en.pdf">PDF版</a></p>
+<h2 id="-">教程结构</h2>
+<p>我们将从概述Vulkan的工作原理和我们必须做的工作开始，以获得屏幕上的第一个三角形。在你理解了它们在整个画面中的基本作用之后，所有小步骤的目的就会更有意义。接下来，我们将用<a href="https://www.lunarg.com/vulkan-sdk/">Vulkan SDK</a>、用于线性代数操作的<a href="http://glm.g-truc.net/">GLM</a>库和用于创建窗口的<a href="http://www.glfw.org/">GLFW</a>设置开发环境。本教程将包括如何在Windows上用Visual Studio设置这些，以及在Ubuntu Linux上用GCC设置。</p>
+<p>之后，我们将实现Vulkan程序的所有基本组件，这些组件是渲染你的第一个三角形所必需的。每一章将大致遵循以下结构：</p>
+<ul>
+<li>介绍一个新的概念和它的目的</li>
+<li>使用所有相关的API调用，将其整合到你的程序中去</li>
+<li>将其部分内容抽象为辅助函数</li>
+</ul>
+<p>尽管每一章都是作为前一章的后续内容来写的，但也可以将这些章节作为介绍某个Vulkan功能的独立文章来阅读。这意味着该网站也可以作为参考资料使用。所有的Vulkan功能和类型都与规范相联系，所以你可以点击它们来了解更多。Vulkan是一个非常新的API，所以规范本身可能有一些不足之处。我们鼓励你向<a href="https://github.com/KhronosGroup/Vulkan-Docs">这个Khronos资源库</a>提交反馈。</p>
+<p>如前所述，Vulkan API有一个相当啰嗦的API，有很多参数，可以让你对图形硬件进行最大程度的控制。这导致像创建纹理这样的基本操作需要很多步骤，每次都要重复。因此，我们将在整个教程中创建我们自己的辅助函数集合。</p>
+<p>每一章的结尾都会有一个链接，指向截至该点的完整代码清单。如果你对代码的结构有任何疑问，或者你正在处理一个错误并想进行比较，你可以参考它。所有的代码文件都已经在多个供应商的显卡上进行了测试，以验证正确性。每一章的末尾还有一个评论部分，你可以提出与具体主题相关的任何问题。请说明你的平台、驱动版本、源代码、预期行为和实际行为，以帮助我们帮助你。</p>
+<p>本教程旨在成为一项社区工作。Vulkan仍然是一个非常新的API，最佳实践还没有真正建立起来。如果你对本教程和网站本身有任何类型的反馈，那么请不要犹豫，向<a href="https://github.com/KhronosGroup/Vulkan-Docs">GitHub仓库</a>提交一个问题或拉动请求。你可以关注该仓库，以获得关于教程更新的通知。</p>
+<p>在你经历了在屏幕上绘制第一个由Vulkan驱动的三角形的仪式后，我们将开始扩展程序，包括线性变换、纹理和3D模型。 </p>
+<p>如果你以前玩过图形API，那么你就会知道，在第一个几何图形出现在屏幕上之前可能有很多步骤。在Vulkan中，有许多这样的初始步骤，但你会看到每一个单独的步骤都很容易理解，不会感觉到多余。同样重要的是要记住，一旦你有了那个看起来很无聊的三角形，绘制完全贴图的3D模型并不需要那么多额外的工作，而超过这个点的每一步都会有更大的收获。</p>
+<p>如果你在跟随教程的过程中遇到了任何问题，那么先看看FAQ，看看你的问题和它的解决方案是否已经列在那里。如果之后你仍然被卡住，那么请随时在最近的相关章节的评论区寻求帮助。</p>
+<p>准备好潜入高性能图形API的未来了吗？让我们<a href="# 概述">开始吧</a>!</p>
+<h1 id="-">概述</h1>
+<blockquote>
+<ul>
+<li>Vulkan的起源</li>
+<li>画一个三角形需要什么<ul>
+<li>第1步 - 实例和物理设备选择</li>
+<li>第2步 - 逻辑设备和队列家族</li>
+<li>第3步--窗口表面和交换链</li>
+<li>第4步--图像视图和帧缓冲器</li>
+<li>第5步 - 渲染通道</li>
+<li>第6步 - 图形管线</li>
+<li>第7步 - 命令池和命令缓冲区</li>
+<li>第8步 - 主循环</li>
+<li>总结</li>
+</ul>
+</li>
+<li>API概念<ul>
+<li>编码惯例</li>
+<li>验证层</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<p>本章将从介绍Vulkan和它所解决的问题开始。之后，我们要看一下第一个三角形所需要的成分。这将给你一个大的画面，让你在后面的每一章中都能看到。最后，我们将介绍Vulkan API的结构和一般使用模式。</p>
+<h2 id="vulkan-">Vulkan的起源</h2>
+<p>就像之前的图形API一样，Vulkan被设计为<a href="https://en.wikipedia.org/wiki/Graphics_processing_unit">GPUs</a>上的一个跨平台抽象。这些API的问题在于，它们所处的时代的特点是图形硬件大多限于可配置的固定功能。程序员不得不以标准格式提供顶点数据，并在光照和阴影选项方面受制于GPU制造商。</p>
+<p>随着显卡架构的成熟，它们开始提供越来越多的可编程功能。所有这些新功能都必须以某种方式与现有的API集成。这导致了不太理想的抽象和图形驱动方面的大量猜测工作，以将程序员的意图映射到现代图形架构上。这就是为什么有这么多的驱动程序更新，以提高游戏的性能，有时会有很大的差距。由于这些驱动程序的复杂性，应用程序开发人员还需要处理供应商之间的不一致问题，如<a href="https://en.wikipedia.org/wiki/Shader">着色器</a>所接受的语法。除了这些新功能，在过去的十年中，还涌现了大量具有强大图形硬件的移动设备。这些移动GPUs根据其能量和空间要求，有不同的架构。其中一个例子是<a href="https://en.wikipedia.org/wiki/Tiled_rendering">平铺渲染</a>，通过为程序员提供对这一功能的更多控制，它将受益于性能的提高。另一个源于这些API年代的限制是有限的多线程支持，这可能导致CPU方面的瓶颈。</p>
+<p>Vulkan通过为现代图形架构从头设计解决了这些问题。它通过允许程序员使用更粗略的API清楚地指定他们的意图来减少驱动开销，并允许多线程并行创建和提交命令。它通过改用单一编译器的标准化字节码格式，减少了着色器编译中的不一致性。最后，它通过将图形和计算功能统一到一个API中，承认了现代图形卡的通用处理能力。</p>
+<h2 id="-">画一个三角形需要什么</h2>
+<p>我们现在来看看在一个良好的Vulkan程序中渲染一个三角形所需的所有步骤的概述。这里介绍的所有概念都将在接下来的章节中详细阐述。这只是为了给你一个大的画面，以便将所有单独的组件联系起来。</p>
+<h3 id="-1-">第1步 - 实例和物理设备选择</h3>
+<p>一个Vulkan应用程序从通过<code>VkInstance</code>设置Vulkan API开始。通过描述您的应用程序和您将要使用的任何API扩展来创建一个实例。在创建实例后，你可以查询Vulkan支持的硬件，并选择一个或多个<code>VkPhysicalDevices</code>来进行操作。您可以查询VRAM大小和设备能力等属性，以选择所需的设备，例如，倾向于使用专用显卡。</p>
+<h3 id="-2-">第2步 - 逻辑设备和队列系列</h3>
+<p>在选择了正确的硬件设备后，你需要创建一个<code>VkDevice</code>（逻辑设备），在这里你可以更具体地描述你将使用哪些<code>VkPhysicalDeviceFeatures</code>，比如多视口渲染和64位浮点。你还需要指定你想使用的队列系列。使用Vulkan进行的大多数操作，如绘制命令和内存操作，都是通过提交给<code>VkQueue</code>来异步执行的。队列是由队列家族分配的，每个队列家族在其队列中支持一组特定的操作。例如，可以为图形、计算和内存传输操作提供单独的队列家族。队列家族的可用性也可以作为物理设备选择中的一个区分因素。支持Vulkan的设备有可能不提供任何图形功能，但是目前所有支持Vulkan的显卡一般都会支持我们感兴趣的所有队列操作。</p>
+<h3 id="-3-">第3步 - 窗口表面和交换链</h3>
+<p>除非你只对屏幕外的渲染感兴趣，否则你将需要创建一个窗口来呈现渲染的图像。窗口可以通过本地平台的API或者<a href="https://www.glfw.org/">GLFW</a>和<a href="https://www.libsdl.org/">SDL</a>等库来创建。我们将在本教程中使用GLFW，但在下一章中会有更多的介绍。</p>
+<p>我们还需要两个组件来实际渲染到一个窗口：一个窗口表面（<code>VkSurfaceKHR</code>）和一个交换链（<code>VkSwapchainKHR</code>）。注意<code>KHR</code>的后缀，这意味着这些对象是Vulkan扩展的一部分。Vulkan API本身是完全与平台无关的，这就是为什么我们需要使用标准化的WSI（Window System Interface）扩展来与窗口管理器交互。表面是一个跨平台的窗口抽象，用于渲染，一般通过提供对本地窗口句柄的引用来实例化，例如Windows的<code>HWND</code>。幸运的是，GLFW库有一个内置函数来处理这个平台的具体细节。</p>
+<p>交换链是一个渲染目标的集合。它的基本目的是确保我们当前正在渲染的图像与当前屏幕上的图像不同。这对于确保只显示完整的图像是很重要的。每次我们想画一个帧时，我们必须要求交换链为我们提供一个要渲染的图像。当我们完成了一个帧的绘制，图像就会被送回交换链，以便在某一时刻被呈现到屏幕上。渲染目标的数量和将完成的图像呈现到屏幕上的条件取决于呈现模式。常见的呈现模式是双缓冲（vsync）和三缓冲。我们将在交换链创建章节中研究这些。</p>
+<p>一些平台允许你通过<code>VK_KHR_display</code>和<code>VK_KHR_display_swapchain</code>扩展直接渲染到显示器上，而不与任何窗口管理器交互。这些允许你创建一个代表整个屏幕的表面，例如，可以用来实现你自己的窗口管理器。</p>
+<h3 id="-4-">第4步 - 图像视图和帧缓冲器</h3>
+<p>为了绘制从交换链获得的图像，我们必须把它包装成一个<code>VkImageView</code>和<code>VkFramebuffer</code>。一个图像视图引用一个要使用的图像的特定部分，而一个帧缓冲区引用要用于颜色、深度和模板目标的图像视图。因为在交换链中可能有许多不同的图像，我们将预先为每个图像创建一个图像视图和framebuffer，并在绘制时选择合适的。</p>
+<h3 id="-5-">第5步 - 渲染通道</h3>
+<p>Vulkan中的渲染传递描述了在渲染操作中使用的图像类型，它们将如何被使用，以及它们的内容应该如何被处理。在我们最初的三角形渲染应用中，我们将告诉Vulkan，我们将使用一个单一的图像作为颜色目标，并且我们希望在绘图操作之前将其清除为纯色。渲染通道只描述了图像的类型，而<code>VkFramebuffer</code>实际上是将特定的图像绑定到这些槽中。</p>
+<h3 id="-6-">第6步 - 图形管线</h3>
+<p>Vulkan中的图形管道是通过创建一个<code>VkPipeline</code>对象来设置的。它描述了显卡的可配置状态，比如视口大小和深度缓冲器的操作，以及使用<code>VkShaderModule</code>对象的可编程状态。<code>VkShaderModule</code>对象是由着色器字节码创建的。驱动程序还需要知道哪些渲染目标将在管道中使用，我们通过引用渲染通道来指定。</p>
+<p>与现有的API相比，Vulkan最突出的特点之一是几乎所有的图形管道配置都需要提前设置。这意味着，如果你想切换到一个不同的着色器或稍微改变你的顶点布局，那么你需要完全重新创建图形管道。这意味着你将不得不为你的渲染操作所需的所有不同组合提前创建许多<code>VkPipeline</code>对象。只有一些基本的配置，比如视口大小和透明颜色，可以动态地改变。所有的状态也需要明确地描述，例如，没有默认的颜色混合状态。</p>
+<p>好消息是，因为你做的是相当于提前编译而不是及时编译，所以驱动程序有更多的优化机会，运行时的性能也更可预测，因为像切换到不同的图形管道的大型状态变化是非常明确的。</p>
+<h3 id="-7-">第7步 - 命令池和命令缓冲区</h3>
+<p>如前所述，Vulkan中许多我们想要执行的操作，如绘图操作，都需要提交给队列。这些操作首先需要被记录到<code>VkCommandBuffer</code>中，然后才能被提交。这些命令缓冲区是从<code>VkCommandPool</code>中分配的，它与特定的队列系列相关。为了画一个简单的三角形，我们需要记录一个有以下操作的命令缓冲区。</p>
+<ul>
+<li>开始渲染通道</li>
+<li>绑定图形管线</li>
+<li>绘制3个顶点</li>
+<li>结束渲染过程</li>
+</ul>
+<p>因为帧缓冲区中的图像取决于交换链将给我们的具体图像，所以我们需要为每个可能的图像记录一个命令缓冲区，并在绘制时选择正确的图像。另一种方法是每一帧都重新记录命令缓冲区，这样做的效率就不高了。</p>
+<h3 id="-8-">第8步 - 主循环</h3>
+<p>现在，绘图命令已经被包装成一个命令缓冲区，主循环就非常简单了。我们首先用<code>vkAcquireNextImageKHR</code>从交换链中获取一个图像。然后，我们可以为该图像选择合适的命令缓冲区，并用<code>vkQueueSubmit</code>来执行它。最后，我们用<code>vkQueuePresentKHR</code>将图像返回到交换链，以便呈现在屏幕上。</p>
+<p>提交给队列的操作是异步执行的。因此，我们必须使用同步对象，如semaphores来确保正确的执行顺序。绘制命令缓冲区的执行必须被设置为等待图像采集完成，否则可能会发生我们开始对一个仍在读取的图像进行渲染，以便在屏幕上呈现。<code>vkQueuePresentKHR</code>调用又需要等待渲染完成，为此我们将使用第二个semaphore，在渲染完成后发出信号。</p>
+<h3 id="-">总结</h3>
+<p>这次旋风式的旅行应该让你对绘制第一个三角形的工作有一个基本的了解。一个真实世界的程序包含更多的步骤，比如分配顶点缓冲区、创建统一缓冲区和上传纹理图像，这些将在随后的章节中讲述，但我们将从简单的开始，因为Vulkan的学习曲线已经足够陡峭了。请注意，我们将通过最初在顶点着色器中嵌入顶点坐标而不是使用顶点缓冲器来欺骗一下。这是因为管理顶点缓冲器需要先熟悉一下命令缓冲器。</p>
+<p>所以简而言之，为了绘制第一个三角形，我们需要。</p>
+<ul>
+<li>创建一个VkInstance</li>
+<li>选择一个支持的显卡(VkPhysicalDevice)</li>
+<li>创建一个VkDevice和VkQueue，用于绘制和展示</li>
+<li>创建一个窗口、窗口表面和交换链</li>
+<li>将交换链的图像包裹到VkImageView中</li>
+<li>创建一个渲染通道，指定渲染目标和用途</li>
+<li>为渲染通道创建帧缓冲区</li>
+<li>设置图形管线</li>
+<li>为每个可能的交换链图像分配并记录一个命令缓冲区的绘制命令</li>
+<li>通过获取图像来绘制帧，提交正确的绘制命令缓冲区，并将图像返回给交换链。</li>
+</ul>
+<p>这有很多步骤，但每个单独步骤的目的将在接下来的章节中变得非常简单和清晰。如果你对单个步骤与整个程序的关系感到困惑，你应该回头看看这一章。</p>
+<h2 id="api-">API概念</h2>
+<p>本章最后将简单介绍一下Vulkan API在较低层次上的结构。</p>
+<h3 id="-">编码约定</h3>
+<p>所有的Vulkan函数、枚举和结构都在<code>vulkan.h</code>头中定义，它包含在LunarG开发的<code>Vulkan SDK</code>中。我们将在下一章中研究如何安装这个SDK。</p>
+<p>函数的前缀是小写的<code>vk</code>，枚举和结构等类型的前缀是<code>Vk</code>，枚举值的前缀是<code>VK_</code>。API大量使用结构体来为函数提供参数。例如，对象的创建通常遵循这种模式。</p>
+<pre><code>VkXXXCreateInfo createInfo{};
+createInfo.sType = VK_STRUCTURE_TYPE_XXX_CREATE_INFO;
+createInfo.pNext = nullptr;
+createInfo.foo = ...;
+createInfo.bar = ...;
+
+VkXXX object;
+if (vkCreateXXX(&amp;createInfo, nullptr, &amp;object) != VK_SUCCESS) {
+    std::cerr &lt;&lt; &quot;failed to create object&quot; &lt;&lt; std::endl;
+    return false;
+}
+</code></pre><p>Vulkan中的许多结构需要你在<code>sType</code>成员中明确指定结构的类型。<code>pNext</code>成员可以指向一个扩展结构，在本教程中永远是<code>nullptr</code>。创建或销毁对象的函数将有一个<code>VkAllocationCallbacks</code>参数，允许你使用驱动内存的自定义分配器，在本教程中也将是<code>nullptr</code>。</p>
+<p>几乎所有的函数都返回一个<code>VkResult</code>，它要么是<code>VK_SUCCESS</code>，要么是一个错误代码。该规范描述了每个函数可以返回哪些错误代码以及它们的含义。</p>
+<p>验证层
+如前所述，Vulkan是为高性能和低驱动开销而设计的。因此，它默认会包含非常有限的错误检查和调试功能。如果你做错了什么，驱动程序往往会崩溃，而不是返回错误代码，或者更糟糕的是，它在你的显卡上似乎可以工作，但在其他显卡上却完全失败。</p>
+<p>Vulkan允许你通过一个被称为验证层的功能来启用广泛的检查。验证层是可以插入到API和图形驱动之间的代码片断，可以做一些事情，比如对函数参数进行额外的检查和跟踪内存管理问题。好的是，你可以在开发过程中启用它们，然后在发布你的应用程序时完全禁用它们，实现零开销。任何人都可以编写自己的验证层，但LunarG的Vulkan SDK提供了一套标准的验证层，我们将在本教程中使用。你还需要注册一个回调函数来接收来自各层的调试信息。</p>
+<p>由于Vulkan对每一个操作都非常明确，而且验证层非常广泛，因此与OpenGL和Direct3D相比，要找出你的屏幕变黑的原因实际上会容易得多</p>
+<p>在我们开始写代码之前，只有一个步骤，那就是<a href="# 开发环境">设置开发环境</a>。</p>
+<h1 id="-">开发环境</h1>
+<ul>
+<li><a href="#_Windows">Windows</a><ul>
+<li><a href="#_Vulkan-SDK">Vulkan SDK</a></li>
+<li><a href="#_GLFW">GLFW</a></li>
+<li><a href="#_GLM">GLM</a></li>
+<li><a href="#_Setting-up-Visual-Studio">Setting up Visual Studio</a></li>
+</ul>
+</li>
+<li><a href="#_Linux">Linux</a><ul>
+<li><a href="#_Vulkan-Packages">Vulkan Packages</a></li>
+<li><a href="#_GLFW-2">GLFW</a></li>
+<li><a href="#_GLM-2">GLM</a></li>
+<li><a href="#_Shader-Compiler">Shader Compiler</a></li>
+<li><a href="#_Setting-up-a-makefile-project">Setting up a makefile project</a></li>
+</ul>
+</li>
+<li><a href="#_MacOS">MacOS</a><ul>
+<li><a href="#_Vulkan-SDK-2">Vulkan SDK</a></li>
+<li><a href="#_GLFW-2">GLFW</a></li>
+<li><a href="#_GLM-2">GLM</a></li>
+<li><a href="#_Setting-up-Xcode">Setting up Xcode</a></li>
+</ul>
+</li>
+</ul>
+<p>在这一章中，我们将设置您开发Vulkan应用程序的环境，并安装一些有用的库。除了编译器之外，我们将使用的所有工具都与Windows、Linux和MacOS兼容，但安装它们的步骤有些不同，这就是为什么它们在这里被单独描述。</p>
+<h2 id="windows">Windows</h2>
+<p>如果你在为Windows开发，那么我将假设你正在使用Visual Studio来编译你的代码。为了完全支持C++17，你需要使用Visual Studio 2017或2019。下面概述的步骤是为VS 2017编写的。</p>
+<h3 id="vulkan-sdk">Vulkan SDK</h3>
+<p>开发Vulkan应用程序所需的最重要组件是SDK。它包括头文件、标准验证层、调试工具和Vulkan函数的加载器。该加载器在运行时查找驱动程序中的函数，类似于OpenGL的GLEW--如果你熟悉的话。</p>
+<p>SDK可以通过页面底部的按钮从<a href="https://vulkan.lunarg.com/">LunarG网站</a>下载。你不需要创建一个账户，但它会让你访问一些可能对你有用的额外文档。</p>
+<p><img src="https://vulkan-tutorial.com/images/vulkan_sdk_download_buttons.png" alt="vulkan_sdk_download_buttons"></p>
+<p>继续进行安装，并注意SDK的安装位置。我们要做的第一件事是验证你的显卡和驱动是否正确支持Vulkan。进入你安装SDK的目录，打开<code>Bin</code>目录，运行<code>vkcube.exe</code>演示。你应该看到以下情况。</p>
+<p><img src="https://vulkan-tutorial.com/images/cube_demo.png" alt="cube_demo"></p>
+<p>如果你收到一个错误信息，那么请确保你的驱动程序是最新的，包括Vulkan运行时间，并且你的显卡被支持。有关主要供应商的驱动程序的链接，请参见介绍章节。</p>
+<p>这个目录中还有一个程序对开发很有用。<code>glslangValidator.exe</code>和<code>glslc.exe</code>程序将被用来把着色器从人类可读的<a href="https://en.wikipedia.org/wiki/OpenGL_Shading_Language">GLSL</a>编译成字节码。我们将在<a href="https://vulkan-tutorial.com/en/Drawing_a_triangle/Graphics_pipeline_basics/Shader_modules">着色器模块</a>一章中深入介绍这个问题。Bin目录还包含Vulkan加载器和验证层的二进制文件，而<code>Lib</code>目录包含库。</p>
+<p>最后是<code>Include</code>目录，包含Vulkan头文件。请自由探索其他文件，但我们在本教程中不需要它们。</p>
+<h3 id="glfw">GLFW</h3>
+<p>如前所述，Vulkan本身是一个与平台无关的API，不包括创建窗口来显示渲染结果的工具。为了受益于Vulkan的跨平台优势并避免Win32的恐怖，我们将使用<a href="https://www.glfw.org/">GLFW库</a>来创建一个窗口，它支持Windows、Linux和MacOS。还有其他的库可以用于这个目的，比如SDL，但是GLFW的优势在于它还抽象出了Vulkan中除了创建窗口之外的一些其他平台特有的东西。</p>
+<p>你可以在<a href="https://www.glfw.org/download.html">官方网站</a>上找到GLFW的最新版本。在本教程中，我们将使用64位二进制文件，但你当然也可以选择以32位模式构建。在这种情况下，请确保与<code>Lib32</code>目录下的Vulkan SDK二进制文件链接，而不是<code>Lib</code>。下载后，解压到一个方便的位置。我选择在Visual Studio目录下的文档中创建一个<code>Libraries</code>目录。</p>
+<p><img src="https://vulkan-tutorial.com/images/glfw_directory.png" alt="glfw_directory"></p>
+<h3 id="glm">GLM</h3>
+<p>与DirectX 12不同，Vulkan不包括一个用于线性代数操作的库，所以我们必须下载一个。<a href="http://glm.g-truc.net/">GLM</a>是一个不错的库，它是为图形API设计的，也常用于OpenGL。</p>
+<p>GLM是一个只有头的库，所以只要下载<a href="https://github.com/g-truc/glm/releases">最新版本</a>并把它存放在一个方便的位置。你现在应该有一个类似于以下的目录结构:</p>
+<p><img src="https://vulkan-tutorial.com/images/library_directory.png" alt="img"></p>
+<h3 id="-visual-studio">设置Visual Studio</h3>
+<p>现在你已经安装了所有的依赖项，我们可以为Vulkan设置一个基本的Visual Studio项目，并写一点代码以确保一切正常。</p>
+<p>启动Visual Studio并创建一个新的 &quot;Windows Desktop Wizard &quot;项目，输入一个名称并按 &quot;OK &quot;键。</p>
+<p><img src="https://vulkan-tutorial.com/images/vs_new_cpp_project.png" alt="img"></p>
+<p>Make sure that <code>Console Application (.exe)</code> is selected as application type so that we have a place to print debug messages to, and check <code>Empty Project</code> to prevent Visual Studio from adding boilerplate code.</p>
+<p>确保<code>Console Application (.exe)</code>被选为应用程序类型，这样我们就有一个地方可以打印调试信息，并选中 <code>Empty Project</code>以防止Visual Studio添加模板代码。</p>
+<p><img src="https://vulkan-tutorial.com/images/vs_application_settings.png" alt="img"></p>
+<p>按 <code>OK</code>键，创建项目并添加一个C++源文件。你应该已经知道如何做了，但为了完整起见，这里包括了这些步骤。</p>
+<p><img src="https://vulkan-tutorial.com/images/vs_new_item.png" alt="img"> </p>
+<p><img src="https://vulkan-tutorial.com/images/vs_new_source_file.png" alt="img"></p>
+<p>现在在文件中加入以下代码。现在不要担心要去理解它；我们只是要确保你可以编译和运行Vulkan应用程序。我们将在下一章中从头开始。</p>
+<pre><code class="lang-c++">#define GLFW_INCLUDE_VULKAN
+#include &lt;GLFW/glfw3.h&gt;
+
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include &lt;glm/vec4.hpp&gt;
+#include &lt;glm/mat4x4.hpp&gt;
+
+#include &lt;iostream&gt;
+
+int main() {
+    glfwInit();
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    GLFWwindow* window = glfwCreateWindow(800, 600, &quot;Vulkan window&quot;, nullptr, nullptr);
+
+    uint32_t extensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &amp;extensionCount, nullptr);
+
+    std::cout &lt;&lt; extensionCount &lt;&lt; &quot; extensions supported\n&quot;;
+
+    glm::mat4 matrix;
+    glm::vec4 vec;
+    auto test = matrix * vec;
+
+    while(!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
+
+    glfwTerminate();
+
+    return 0;
+}
+</code></pre>
+<p>现在让我们来配置项目以消除错误。打开项目属性对话框，确保选择<code>All Configurations</code>，因为大多数设置适用于<code>Debug</code>和  <code>Release</code>模式。</p>
+<p><img src="https://vulkan-tutorial.com/images/vs_open_project_properties.png" alt="img"></p>
+<p><img src="https://vulkan-tutorial.com/images/vs_all_configs.png" alt="img"></p>
+<p>进入 <code>C++ -&gt; General -&gt; Additional Include Directories</code> 在下拉框中按 <code>&lt;Edit...&gt;</code>.</p>
+<p><img src="https://vulkan-tutorial.com/images/vs_cpp_general.png" alt="img"></p>
+<p>添加Vulkan、GLFW和GLM的头文件目录：<img src="https://vulkan-tutorial.com/images/vs_include_dirs.png" alt="img"></p>
+<p>接下来，在 <code>Linker -&gt; General</code>下打开库目录的编辑器：</p>
+<p><img src="https://vulkan-tutorial.com/images/vs_link_settings.png" alt="img"></p>
+<p>并添加Vulkan和GLFW的对象文件的位置：<img src="https://vulkan-tutorial.com/images/vs_link_dirs.png" alt="img"></p>
+<p>进入 <code>Linker -&gt; Input</code> 在<code>Additional Dependencies</code>下拉框中按 <code>&lt;Edit...&gt;</code></p>
+<p><img src="https://vulkan-tutorial.com/images/vs_link_input.png" alt="img"></p>
+<p>输入Vulkan和GLFW对象文件的名称：<img src="https://vulkan-tutorial.com/images/vs_dependencies.png" alt="img"></p>
+<p>最后改变编译器以支持C++17的特性。<img src="https://vulkan-tutorial.com/images/vs_cpp17.png" alt="img"></p>
+<p>现在你可以关闭项目属性对话框。如果你所做的一切是正确的，那么你应该不再看到代码中突出显示的任何错误。</p>
+<p>最后，确保你实际上是在64位模式下编译的：</p>
+<p><img src="https://vulkan-tutorial.com/images/vs_build_mode.png" alt="img"></p>
+<p>按<code>F5</code>编译并运行该项目，你应该看到一个命令提示符和一个弹出的窗口，像这样。</p>
+<p><img src="https://vulkan-tutorial.com/images/vs_test_window.png" alt="img"></p>
+<p>扩展的数量应该是非零的。恭喜你，你已经为<a href="https://vulkan-tutorial.com/en/Drawing_a_triangle/Setup/Base_code">玩转Vulkan</a>做好了一切准备!</p>
+<h2 id="linux">Linux</h2>
+<p>这些说明将针对Ubuntu、Fedora和Arch Linux用户，但你也可以通过将软件包管理器的特定命令改为适合你的命令来进行学习。你应该有一个支持C++17的编译器（GCC 7+或Clang 5+）。你还需要<code>make</code>。</p>
+<h3 id="vulkan-packages">Vulkan Packages</h3>
+<p>在Linux上开发Vulkan应用程序，你需要的最重要的组件是Vulkan加载器、验证层和几个命令行工具，以测试你的机器是否具备Vulkan功能。</p>
+<ul>
+<li><code>sudo apt install vulkan-tools</code>或<code>sudo dnf install vulkan-tools</code>。命令行实用程序，最重要的是<code>vulkaninfo</code>和<code>vkcube</code>。运行这些工具以确认你的机器支持Vulkan。</li>
+<li><code>sudo apt install libvulkan-dev</code>或<code>sudo dnf install vulkan-loader-devel</code>：安装Vulkan加载器。该加载器在运行时查找驱动中的函数，类似于OpenGL的GLEW--如果你熟悉它。</li>
+<li><code>sudo apt install vulkan-validationlayers-dev spirv-tools</code>或<code>sudo dnf install mesa-vulkan-devel vulkan-validation-layers-devel</code>。安装标准验证层和必要的SPIR-V工具。这些在调试Vulkan应用程序时至关重要，我们将在接下来的章节中讨论它们。</li>
+</ul>
+<p>在Arch Linux上，你可以运行<code>sudo pacman -S vulkan-devel</code>来安装上述所有需要的工具。</p>
+<p>如果安装成功，你应该已经完成了Vulkan部分的安装。记得运行<code>vkcube</code>并确保你在窗口中看到以下内容:</p>
+<p><img src="https://vulkan-tutorial.com/images/cube_demo_nowindow.png" alt="img"></p>
+<p>如果你收到错误信息，那么请确保你的驱动程序是最新的，包括Vulkan运行时间，并且你的显卡被支持。参见<a href="https://vulkan-tutorial.com/en/Introduction">简介章节</a>，以获得主要供应商的驱动程序链接。</p>
+<h3 id="glfw">GLFW</h3>
+<p>如前所述，Vulkan本身是一个与平台无关的API，并不包括创建窗口来显示渲染结果的工具。为了受益于Vulkan的跨平台优势并避免X11的恐怖，我们将使用<a href="http://www.glfw.org/">GLFW库</a>来创建一个窗口，它支持Windows、Linux和MacOS。还有其他的库可以用于这个目的，比如<a href="https://www.libsdl.org/">SDL</a>，但是GLFW的优势在于它还抽象出了Vulkan中除了创建窗口之外的一些其他平台特有的东西。</p>
+<p>我们将通过以下命令来安装GLFW：</p>
+<pre><code class="lang-bash">sudo apt install libglfw3-dev
+</code></pre>
+<p>or</p>
+<pre><code class="lang-bash">sudo dnf install glfw-devel
+</code></pre>
+<p>or</p>
+<pre><code class="lang-bash">sudo pacman -S glfw-wayland # glfw-x11 for X11 users
+</code></pre>
+<h3 id="glm">GLM</h3>
+<p>与DirectX 12不同，Vulkan不包括一个用于线性代数操作的库，所以我们必须下载一个。<a href="http://glm.g-truc.net/">GLM</a>是一个不错的库，它是为图形API设计的，也常用于OpenGL。</p>
+<p>它是一个纯头文件库，可以从<code>libglm-dev</code>或<code>glm-devel</code>软件包中安装：</p>
+<pre><code class="lang-bash">sudo apt install libglm-dev
+</code></pre>
+<p>or</p>
+<pre><code class="lang-bash">sudo dnf install glm-devel
+</code></pre>
+<p>or</p>
+<pre><code class="lang-bash">sudo pacman -S glm
+</code></pre>
+<h3 id="shader-compiler">Shader Compiler</h3>
+<p>我们已经拥有了我们所需要的一切，除了我们需要一个程序来将着色器从人类可读的<a href="https://en.wikipedia.org/wiki/OpenGL_Shading_Language">GLSL</a>编译成字节码。</p>
+<p>两个流行的着色器编译器是Khronos Group的<code>glslangValidator</code>和Google的<code>glslc</code>。后者有一个熟悉的类似GCC和Clang的用法，所以我们就用它：在Ubuntu上，下载Google的<a href="https://github.com/google/shaderc/blob/main/downloads.md">unofficial binaries</a>，然后复制<code>glslc</code>到你的<code>/usr/local/bin</code>。注意你可能需要<code>sudo</code>，这取决于你的权限。在Fedora上使用<code>sudo dnf install glslc</code>，而在Arch Linux上运行<code>sudo pacman -S shaderc</code>。为了测试，运行<code>glslc</code>，它应该正确地抱怨我们没有传递任何着色器来编译.</p>
+<pre><code>glslc: error: no input files
+</code></pre><p>我们将在<a href="https://vulkan-tutorial.com/en/Drawing_a_triangle/Graphics_pipeline_basics/Shader_modules">着色器模块</a>章节中深入介绍<code>glslc</code>。</p>
+<h3 id="setting-up-a-makefile-project">Setting up a makefile project</h3>
+<p>现在你已经安装了所有的依赖项，我们可以为Vulkan建立一个基本的makefile项目，并写一点代码以确保一切正常。</p>
+<p>在一个方便的位置创建一个新的目录，名称为<code>VulkanTest</code>。创建一个名为<code>main.cpp</code>的源文件并插入以下代码。现在不要担心试图理解它；我们只是要确保你可以编译和运行Vulkan应用程序。我们将在下一章中从头开始。</p>
+<pre><code class="lang-c++">#define GLFW_INCLUDE_VULKAN
+#include &lt;GLFW/glfw3.h&gt;
+
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include &lt;glm/vec4.hpp&gt;
+#include &lt;glm/mat4x4.hpp&gt;
+
+#include &lt;iostream&gt;
+
+int main() {
+    glfwInit();
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    GLFWwindow* window = glfwCreateWindow(800, 600, &quot;Vulkan window&quot;, nullptr, nullptr);
+
+    uint32_t extensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &amp;extensionCount, nullptr);
+
+    std::cout &lt;&lt; extensionCount &lt;&lt; &quot; extensions supported\n&quot;;
+
+    glm::mat4 matrix;
+    glm::vec4 vec;
+    auto test = matrix * vec;
+
+    while(!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
+
+    glfwTerminate();
+
+    return 0;
+}
+</code></pre>
+<p>接下来，我们将编写一个makefile来编译和运行这个基本的Vulkan代码。创建一个名为<code>Makefile</code>的新的空文件。我将假设你已经有一些关于makefile的基本经验，比如变量和规则如何工作。如果没有，你可以通过<a href="https://makefiletutorial.com/">这个教程</a>快速上手。</p>
+<p>我们将首先定义几个变量，以简化文件的其余部分。定义一个<code>CFLAGS</code>变量，它将指定基本的编译器标志。</p>
+<pre><code class="lang-make">CFLAGS = -std=c++17 -O2
+</code></pre>
+<p>我们将使用现代C++（<code>-std=c++17</code>），并将优化级别设置为O2。我们可以去掉-O2，以便更快地编译程序，但我们应该记得在发布构建时把它放回去。</p>
+<p>同样地，在<code>LDFLAGS</code>变量中定义链接器标志：</p>
+<pre><code class="lang-make">LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
+</code></pre>
+<p>标志<code>-glfw</code>是用于GLFW，<code>-lvulkan</code>与Vulkan函数加载器链接，其余的标志是GLFW需要的低级系统库。剩下的标志是GLFW本身的依赖：线程和窗口管理。</p>
+<p>你的系统可能还没有安装<code>Xxf68vm</code>和<code>Xi</code>库。你可以在以下软件包中找到它们：</p>
+<pre><code class="lang-bash">sudo apt install libxxf86vm-dev libxi-dev
+</code></pre>
+<p>or</p>
+<pre><code class="lang-bash">sudo dnf install libXi libXxf86vm
+</code></pre>
+<p>or</p>
+<pre><code class="lang-bash">sudo pacman -S libxi libxxf86vm
+</code></pre>
+<p>指定编译<code>VulkanTest</code>的规则现在很简单了。请确保使用制表符来缩进，而不是空格。</p>
+<pre><code class="lang-make">VulkanTest: main.cpp
+    g++ $(CFLAGS) -o VulkanTest main.cpp $(LDFLAGS)
+</code></pre>
+<p>通过保存makefile并在有<code>main.cpp</code>和<code>Makefile</code>的目录下运行<code>make</code>来验证这一规则是否有效。这应该会产生一个<code>VulkanTest</code>可执行文件。</p>
+<p>我们现在再定义两条规则，<code>test</code>和<code>clean</code>，前者将运行可执行文件，后者将删除已建的可执行文件。</p>
+<pre><code class="lang-make">.PHONY: test clean
+
+test: VulkanTest
+    ./VulkanTest
+
+clean:
+    rm -f VulkanTest
+</code></pre>
+<p>运行<code>make test</code>应该显示程序成功运行，并显示Vulkan扩展的数量。当你关闭空窗口时，该程序应该以成功返回代码（<code>0</code>）退出。你现在应该有一个完整的makefile，类似于以下内容。</p>
+<pre><code class="lang-make">CFLAGS = -std=c++17 -O2
+LDFLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
+
+VulkanTest: main.cpp
+    g++ $(CFLAGS) -o VulkanTest main.cpp $(LDFLAGS)
+
+.PHONY: test clean
+
+test: VulkanTest
+    ./VulkanTest
+
+clean:
+    rm -f VulkanTest
+</code></pre>
+<p>现在你可以使用这个目录作为你的Vulkan项目的模板。复制一份，重命名为 &quot;HelloTriangle &quot;并删除 &quot;main.cpp &quot;中的所有代码。</p>
+<p>现在你已经为<a href="https://vulkan-tutorial.com/en/Drawing_a_triangle/Setup/Base_code">真正的冒险</a>做好了一切准备。</p>
+<h2 id="macos">MacOS</h2>
+<p>这些说明将假设你使用Xcode和<a href="https://brew.sh/">Homebrew软件包管理器</a>。另外，请记住，你至少需要MacOS 10.11版本，而且你的设备需要支持<a href="https://en.wikipedia.org/wiki/Metal_(API">Metal API</a>#Supported_GPU)。</p>
+<h3 id="vulkan-sdk">Vulkan SDK</h3>
+<p>在开发Vulkan应用程序时，你需要的最重要的组件是SDK。它包括头文件、标准验证层、调试工具和Vulkan函数的加载器。装载器在运行时查找驱动程序中的函数，类似于OpenGL的GLEW--如果你对它很熟悉的话。</p>
+<p>SDK可以从<a href="https://vulkan.lunarg.com/">LunarG网站</a>使用页面底部的按钮下载。你不需要创建一个账户，但它会让你访问一些可能对你有用的额外文档。</p>
+<p><img src="https://vulkan-tutorial.com/images/vulkan_sdk_download_buttons.png" alt="img"></p>
+<p>MacOS的SDK版本内部使用<a href="https://moltengl.com/">MoltenVK</a>。在MacOS上没有对Vulkan的本地支持，所以MoltenVK实际上是作为一个层，将Vulkan的API调用翻译成苹果的Metal图形框架。有了它，你可以利用苹果的Metal框架的调试和性能优势。</p>
+<p>下载后，只需将内容解压到您选择的文件夹中（请记住，当您在Xcode上创建项目时需要参考它）。在解压后的文件夹中，在 &quot;Applications &quot;文件夹中，你应该有一些可执行文件，可以使用SDK运行一些演示。运行<code>vkcube</code>可执行文件，你会看到以下内容:</p>
+<p><img src="https://vulkan-tutorial.com/images/cube_demo_mac.png" alt="img"></p>
+<h3 id="glfw">GLFW</h3>
+<p>如前所述，Vulkan本身是一个与平台无关的API，并不包括创建窗口来显示渲染结果的工具。我们将使用<a href="http://www.glfw.org/">GLFW库</a>来创建一个窗口，它支持Windows、Linux和MacOS。还有其他的库可以用于这个目的，比如<a href="https://www.libsdl.org/">SDL</a>，但是GLFW的优势在于它还抽象出了Vulkan中除了创建窗口之外的一些其他平台特有的东西。</p>
+<p>为了在MacOS上安装GLFW，我们将使用Homebrew包管理器来获取<code>glfw</code>包。</p>
+<pre><code class="lang-bash">brew install glfw
+</code></pre>
+<h3 id="glm">GLM</h3>
+<p>Vulkan不包括线性代数操作的库，所以我们必须下载一个。<a href="http://glm.g-truc.net/">GLM</a>是一个不错的库，它是为图形API设计的，也常用于OpenGL。</p>
+<p>它是一个只包含头文件的库，可以从<code>glm</code>包中安装:</p>
+<pre><code class="lang-bash">brew install glm
+</code></pre>
+<h3 id="setting-up-xcode">Setting up Xcode</h3>
+<p>Now that all the dependencies are installed we can set up a basic Xcode project for Vulkan. Most of the instructions here are essentially a lot of &quot;plumbing&quot; so we can get all the dependencies linked to the project. Also, keep in mind that during the following instructions whenever we mention the folder <code>vulkansdk</code> we are refering to the folder where you extracted the Vulkan SDK.</p>
+<p>Start Xcode and create a new Xcode project. On the window that will open select Application &gt; Command Line Tool.</p>
+<p>现在所有的依赖都已经安装完毕，我们可以为Vulkan设置一个基本的Xcode项目。这里的大部分说明基本上都是一些 &quot;管道&quot;，这样我们就可以把所有的依赖项链接到项目中。另外，请记住，在下面的说明中，当我们提到<code>vulkansdk</code>文件夹时，我们指的是你提取Vulkan SDK的文件夹。</p>
+<p>启动Xcode并创建一个新的Xcode项目。在打开的窗口中选择Application &gt; Command Line Tool。</p>
+<p><img src="https://vulkan-tutorial.com/images/xcode_new_project.png" alt="img"></p>
+<p>选择 <code>Next</code>，为项目写一个名称，&quot;Language&quot;选择 &quot;C++&quot;。</p>
+<p><img src="https://vulkan-tutorial.com/images/xcode_new_project_2.png" alt="img"></p>
+<p>按 <code>Next</code>，项目应该已经创建。现在，让我们把生成的<code>main.cpp</code>文件中的代码改为以下代码。</p>
+<pre><code class="lang-c++">#define GLFW_INCLUDE_VULKAN
+#include &lt;GLFW/glfw3.h&gt;
+
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include &lt;glm/vec4.hpp&gt;
+#include &lt;glm/mat4x4.hpp&gt;
+
+#include &lt;iostream&gt;
+
+int main() {
+    glfwInit();
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    GLFWwindow* window = glfwCreateWindow(800, 600, &quot;Vulkan window&quot;, nullptr, nullptr);
+
+    uint32_t extensionCount = 0;
+    vkEnumerateInstanceExtensionProperties(nullptr, &amp;extensionCount, nullptr);
+
+    std::cout &lt;&lt; extensionCount &lt;&lt; &quot; extensions supported\n&quot;;
+
+    glm::mat4 matrix;
+    glm::vec4 vec;
+    auto test = matrix * vec;
+
+    while(!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
+
+    glfwTerminate();
+
+    return 0;
+}
+</code></pre>
+<p>请记住，你不需要理解所有这些代码的作用，我们只是设置一些API调用，以确保一切都在工作。</p>
+<p>Xcode应该已经显示了一些错误，如找不到库。我们现在将开始配置项目以摆脱这些错误。在<em>项目导航仪</em>面板上选择你的项目。打开<em>Build Settings</em>标签，然后:</p>
+<ul>
+<li>找到<strong>Header Search Paths</strong>字段，添加一个链接到<code>/usr/local/include</code>（这是Homebrew安装头文件的地方，所以glm和glfw3头文件应该在那里），并添加一个链接到<code>vulkansdk/macOS/include</code>以获取Vulkan头文件。</li>
+<li>找到<strong>Library Search Paths</strong>栏，添加一个链接到<code>/usr/local/lib</code>（同样，这是Homebrew安装库的地方，所以glm和glfw3库文件应该在那里）和一个链接到<code>vulkansdk/macOS/lib</code>。</li>
+</ul>
+<p>它应该看起来像这样（显然，路径会有所不同，这取决于你在你的文件上放置的位置）:</p>
+<p><img src="https://vulkan-tutorial.com/images/xcode_paths.png" alt="img"></p>
+<ul>
+<li><p>现在，在<em>Build Phases</em>标签，在<strong>Link Binary With Libraries</strong>上，我们将添加<code>glfw3</code>和<code>vulkan</code>框架。为了方便起见，我们将在项目中添加动态库（如果你想使用静态框架，你可以查看这些库的文档）。</p>
+<ul>
+<li>对于glfw来说，打开<code>/usr/local/lib</code>文件夹，你会发现一个文件名是<code>libglfw.3.x.dylib</code>（&quot;x &quot;是库的版本号，它可能不同，取决于你何时从Homebrew下载包）。只需将该文件拖到Xcode的链接框架和库选项卡中。</li>
+<li>对于vulkan，进入<code>vulkansdk/macOS/lib</code>。对<code>libvulkan.1.dylib</code>和<code>libvulkan.1.x.xx.dylib</code>（其中 &quot;x &quot;将是你下载的SDK的版本号）这两个文件做同样的操作。</li>
+</ul>
+</li>
+</ul>
+<p>添加完这些库后，在同一标签上的<strong>Copy Files</strong>将 &quot;Destination&quot;改为 &quot;Frameworks&quot;，清除子路径并取消选择 &quot;Copy only when installing&quot;。点击 &quot;+&quot;号，在这里也添加所有这三个框架。</p>
+<p>你的Xcode配置应该看起来像:</p>
+<p><img src="https://vulkan-tutorial.com/images/xcode_frameworks.png" alt="img"></p>
+<p>你需要设置的最后一件事是几个环境变量。在Xcode的工具栏上，进入 &quot;Product&quot;&gt;&quot;Scheme&quot;&gt;&quot;Edit Scheme...&quot;，在 &quot;Arguments &quot;选项卡中添加以下两个环境变量。</p>
+<ul>
+<li>VK_ICD_FILENAMES = <code>vulkansdk/macOS/share/vulkan/icd.d/MoltenVK_icd.json</code>。</li>
+<li>VK_LAYER_PATH = <code>vulkansdk/macOS/share/vulkan/explicit_layer.d</code>。</li>
+</ul>
+<p>它应该看起来像这样:</p>
+<p><img src="https://vulkan-tutorial.com/images/xcode_variables.png" alt="img"></p>
+<p>最后，你应该都准备好了! 现在，如果你运行该项目（记得根据你选择的配置，将构建配置设置为Debug或Release），你应该看到以下内容:</p>
+<p><img src="https://vulkan-tutorial.com/images/xcode_output.png" alt="img"></p>
+<p>扩展的数量应该是非零的。其他日志来自库，你可能会从这些日志中得到不同的信息，这取决于你的配置。</p>
+<p>你现在已经为<a href="https://vulkan-tutorial.com/en/Drawing_a_triangle/Setup/Base_code">真正的东西</a>做好了所有准备。</p>
+<h1 id="-">画一个三角形</h1>
+<h2 id="-">开始</h2>
+<h3 id="-">基本代码</h3>
+<ul>
+<li><a href="# 资源管理">总体结构</a></li>
+<li><a href="# 资源管理">资源管理</a></li>
+<li><a href="# 集成GLFW">集成GLFW</a></li>
+</ul>
+<h4 id="-">总体结构</h4>
+<p>在上一章中，你已经创建了一个具有所有适当配置的Vulkan项目，并使用示例代码对其进行了测试。在这一章中，我们将从头开始编写以下代码：</p>
+<pre><code class="lang-c++">#include &lt;vulkan/vulkan.h&gt;
+
+#include &lt;iostream&gt;
+#include &lt;stdexcept&gt;
+#include &lt;cstdlib&gt;
+
+class HelloTriangleApplication {
+public:
+    void run() {
+        initVulkan();
+        mainLoop();
+        cleanup();
+    }
+
+private:
+    void initVulkan() {
+
+    }
+
+    void mainLoop() {
+
+    }
+
+    void cleanup() {
+
+    }
+};
+
+int main() {
+    HelloTriangleApplication app;
+
+    try {
+        app.run();
+    } catch (const std::exception&amp; e) {
+        std::cerr &lt;&lt; e.what() &lt;&lt; std::endl;
+        return EXIT_FAILURE;
+    }
+
+    return EXIT_SUCCESS;
+}
+</code></pre>
+<p>我们首先包括LunarG SDK的Vulkan头，它提供了函数、结构和枚举。<code>stdexcept&#39;和</code>iostream&#39;头文件被包括在内，用于报告和传播错误。<code>cstdlib</code>头提供了<code>EXIT_SUCCESS</code>和<code>EXIT_FAILURE</code>宏。</p>
+<p>程序本身被包装成一个类，我们将把Vulkan对象存储为私有类成员，并添加函数来启动每个对象，这些函数将被<code>initVulkan</code>函数调用。一旦一切准备就绪，我们将进入主循环，开始渲染帧。我们将填入<code>mainLoop</code>函数，以包括一个循环，该循环一直迭代到一会儿关闭窗口。一旦窗口关闭，<code>mainLoop</code>返回，我们将确保取消分配我们在<code>cleanup</code>函数中使用的资源。</p>
+<p>如果在执行过程中发生任何致命的错误，我们将抛出一个<code>std::runtime_error</code>异常，并附上描述性的信息，该信息将传播到<code>main</code>函数，并打印到命令提示符上。为了处理各种标准的异常类型，我们抓取更多的`std::exception&#39;。我们将很快处理的一个错误的例子是发现某个必要的扩展不被支持。</p>
+<p>在这一章之后的每一章都会增加一个新的函数，该函数将从<code>initVulkan</code>中调用，并在<code>cleanup</code>中为需要在最后释放的私有类成员增加一个或多个新的Vulkan对象。</p>
+<h4 id="-">资源管理</h4>
+<p>就像用<code>malloc</code>分配的每块内存都需要调用<code>free</code>一样，我们创建的每个Vulkan对象在不再需要时都需要明确销毁。在C++中，可以使用<a href="https://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization">RAII</a>或<code></code>头中提供的智能指针来执行自动资源管理。然而，我选择在本教程中对Vulkan对象的分配和删除进行明确说明。毕竟，Vulkan的利基是明确每一个操作以避免错误，所以明确对象的生命周期对学习API的工作方式是有好处的。</p>
+<p>在跟随本教程之后，你可以通过编写在构造函数中获取Vulkan对象并在析构函数中释放它们的C++类来实现自动资源管理，或者根据你的所有权要求，为<code>std::unique_ptr</code>或<code>std::shared_ptr</code>提供一个自定义的删除器。RAII是大型Vulkan程序的推荐模型，但对于学习来说，知道幕后发生了什么总是好的。</p>
+<p>Vulkan对象要么用<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/vkCreateXXX.html"><code>vkCreateXXX</code></a>这样的函数直接创建，要么通过<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/vkAllocateXXX.html"><code>vkAllocateXXX</code></a>这样的函数分配给另一个对象。在确保一个对象不再被用于任何地方后，你需要用对应的<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/vkDestroyXXX.html"><code>vkDestroyXXX</code></a>和<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/vkFreeXXX.html"><code>vkFreeXXX</code></a>销毁它。对于不同类型的对象，这些函数的参数通常是不同的，但有一个参数是它们都有的。<code>pAllocator</code>。这是一个可选的参数，允许你指定自定义内存分配器的回调。在本教程中，我们将忽略这个参数，而总是传递<code>nullptr</code>作为参数。</p>
+<h4 id="-glfw">集成GLFW</h4>
+<p>如果你想将Vulkan用于屏幕外的渲染，那么不创建窗口也能很好地工作，但如果真的能显示一些东西，那就更令人兴奋了 首先将<code>#include</code>行替换为：</p>
+<pre><code class="lang-c++">#define GLFW_INCLUDE_VULKAN
+#include &lt;GLFW/glfw3.h&gt;
+</code></pre>
+<p>这样GLFW将包括它自己的定义并自动加载Vulkan头。添加一个<code>initWindow</code>函数，并在其他调用之前从<code>run</code>函数中添加对它的调用。我们将使用该函数来初始化GLFW并创建一个窗口。</p>
+<pre><code class="lang-c++">void run() {
+    initWindow();
+    initVulkan();
+    mainLoop();
+    cleanup();
+}
+
+private:
+    void initWindow() {
+
+    }
+</code></pre>
+<p>在<code>initWindow</code>中的第一个调用应该是<code>glfwInit()</code>，它初始化GLFW库。因为GLFW最初被设计为创建一个OpenGL上下文，我们需要告诉它不要使用下面的调用创建OpenGL上下文：</p>
+<pre><code class="lang-c++">glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+</code></pre>
+<p>Because handling resized windows takes special care that we&#39;ll look into later, disable it for now with another window hint call:</p>
+<p>因为处理调整后的窗口需要特别注意，这点我们将在后面研究，现在用另一个窗口提示的调用禁用它：</p>
+<pre><code class="lang-c++">glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+</code></pre>
+<p>现在剩下的就是创建实际的窗口了。添加一个<code>GLFWwindow* window;</code>私有类成员来存储对它的引用，并用下面的函数初始化该窗口：</p>
+<pre><code class="lang-c++">window = glfwCreateWindow(800, 600, &quot;Vulkan&quot;, nullptr, nullptr);
+</code></pre>
+<p>前三个参数指定窗口的宽度、高度和标题。第四个参数允许你选择性地指定打开窗口的显示器，最后一个参数只与OpenGL有关。</p>
+<p>使用常量而不是硬编码的宽度和高度数字是个好主意，因为我们在未来会多次引用这些值。我在 <code>HelloTriangleApplication</code> 类定义的上方添加了以下几行：</p>
+<pre><code class="lang-c++">const uint32_t WIDTH = 800;
+const uint32_t HEIGHT = 600;
+</code></pre>
+<p>并将创建窗口的调用改为</p>
+<pre><code class="lang-c++">window = glfwCreateWindow(WIDTH, HEIGHT, &quot;Vulkan&quot;, nullptr, nullptr);
+</code></pre>
+<p>You should now have a <code>initWindow</code> function that looks like this:</p>
+<p>你现在应该有一个<code>initWindow</code>函数，看起来像这样。</p>
+<pre><code class="lang-c++">void initWindow() {
+    glfwInit();
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+    window = glfwCreateWindow(WIDTH, HEIGHT, &quot;Vulkan&quot;, nullptr, nullptr);
+}
+</code></pre>
+<p>为了保持应用程序的运行，直到错误发生或窗口关闭，我们需要在<code>mainLoop</code>函数中添加一个事件循环，如下所示。</p>
+<pre><code class="lang-c++">void mainLoop() {
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+    }
+}
+</code></pre>
+<p>这段代码应该是不言自明的。它循环并检查事件，如按下X按钮，直到窗口被用户关闭。这也是我们稍后将调用一个函数来渲染一个单帧的循环。</p>
+<p>一旦窗口被关闭，我们需要通过销毁它和终止GLFW本身来清理资源。这将是我们的第一个<code>cleanup</code>代码:</p>
+<pre><code class="lang-c++">void cleanup() {
+    glfwDestroyWindow(window);
+
+    glfwTerminate();
+}
+</code></pre>
+<p>当你现在运行该程序时，你应该看到一个名为 <code>Vulkan</code> 的窗口出现，直到应用程序通过关闭该窗口终止。现在我们有了Vulkan应用程序的骨架，让我们来<a href="https://vulkan-tutorial.com/Drawing_a_triangle/Setup/Instance">创建第一个Vulkan对象</a>!</p>
+<p><a href="https://vulkan-tutorial.com/code/00_base_code.cpp">C++ code</a></p>
+<h2 id="instance">Instance</h2>
+<ul>
+<li><a href="# 创建一个instance">创建一个instance</a></li>
+<li><a href="# 检查扩展支持">检查扩展支持</a></li>
+<li><a href="https://vulkan-tutorial.com/en/Drawing_a_triangle/Setup/Instance#page_Cleaning-up">Cleaning up</a></li>
+</ul>
+<h3 id="-instance">创建一个instance</h3>
+<p>你需要做的第一件事是通过创建一个<em>instance</em>来初始化Vulkan库。实例是你的应用程序和Vulkan库之间的连接，创建它需要向驱动指定一些关于你的应用程序的细节。</p>
+<p>首先添加一个<code>createInstance&#39;函数并在</code>initVulkan&#39;函数中调用它。</p>
+<pre><code class="lang-c++">void initVulkan() {
+    createInstance();
+}
+</code></pre>
+<p>另外，添加一个数据成员来保存实例的句柄:</p>
+<pre><code class="lang-c++">private:
+VkInstance instance;
+</code></pre>
+<p>现在，为了创建一个实例，我们首先要在一个结构中填写关于我们应用程序的一些信息。这些数据在技术上是可有可无的，但它可能会给驱动提供一些有用的信息，以便优化我们的特定应用（例如，因为它使用了具有某些特殊行为的知名图形引擎）。这个结构被称为[<code>VkApplicationInfo</code>]（<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkApplicationInfo.html）">https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkApplicationInfo.html）</a>:</p>
+<pre><code class="lang-c++">void createInstance() {
+    VkApplicationInfo appInfo{};
+    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+    appInfo.pApplicationName = &quot;Hello Triangle&quot;;
+    appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.pEngineName = &quot;No Engine&quot;;
+    appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+    appInfo.apiVersion = VK_API_VERSION_1_0;
+}
+</code></pre>
+<p>如前所述，Vulkan中的许多结构需要你在<code>sType</code>成员中明确指定类型。这也是许多具有<code>pNext</code>成员的结构之一，可以指向未来的扩展信息。我们在这里使用值初始化，让它保持为<code>nullptr</code>。</p>
+<p>Vulkan中的很多信息都是通过结构体而不是函数参数传递的，我们必须再填入一个结构体，为创建实例提供足够的信息。下一个结构不是可选的，它告诉Vulkan驱动我们要使用哪些全局扩展和验证层。这里的全局意味着它们适用于整个程序，而不是特定的设备，这一点将在接下来的几章中变得清晰。</p>
+<pre><code class="lang-c++">VkInstanceCreateInfo createInfo{};
+createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+createInfo.pApplicationInfo = &amp;appInfo;
+</code></pre>
+<p>前两个参数是直截了当的。接下来的两层则是指定所需的全局扩展。正如在概述章节中提到的，Vulkan是一个与平台无关的API，这意味着你需要一个扩展来与窗口系统对接。GLFW有一个方便的内置函数，可以返回它所需要的扩展，我们可以将其传递给结构:</p>
+<pre><code class="lang-c++">uint32_t glfwExtensionCount = 0;
+const char** glfwExtensions;
+
+glfwExtensions = glfwGetRequiredInstanceExtensions(&amp;glfwExtensionCount);
+
+createInfo.enabledExtensionCount = glfwExtensionCount;
+createInfo.ppEnabledExtensionNames = glfwExtensions;
+</code></pre>
+<p>该结构的最后两个成员决定启用全局验证层。我们将在下一章中更深入地讨论这些问题，所以现在只需将这些成员留空。</p>
+<pre><code class="lang-c++">createInfo.enabledLayerCount = 0;
+</code></pre>
+<p>我们现在已经指定了Vulkan创建实例所需要的一切，我们最终可以执行<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/vkCreateInstance.html"><code>vkCreateInstance</code></a>调用:</p>
+<pre><code class="lang-c++">VkResult result = vkCreateInstance(&amp;createInfo, nullptr, &amp;instance);
+</code></pre>
+<p>正如你所看到的，Vulkan中对象创建函数参数遵循的一般模式是。</p>
+<ul>
+<li>指向带有创建信息的结构的指针</li>
+<li>指向自定义分配器回调的指针，在本教程中总是<code>nullptr</code>。</li>
+<li>指向存储新对象句柄的变量的指针</li>
+</ul>
+<p>如果一切顺利，那么实例的句柄就被存储在<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkInstance.html"><code>VkInstance</code></a>类成员中。几乎所有的Vulkan函数都会返回一个<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkResult.html"><code>VkResult</code></a>类型的值，这个值要么是<code>VK_SUCCESS</code>，要么是一个错误代码。为了检查实例是否被成功创建，我们不需要存储结果，可以直接使用成功值的检查来代替。</p>
+<pre><code class="lang-c++">if (vkCreateInstance(&amp;createInfo, nullptr, &amp;instance) != VK_SUCCESS) {
+    throw std::runtime_error(&quot;failed to create instance!&quot;);
+}
+</code></pre>
+<p>现在运行程序，确保实例创建成功。</p>
+<h3 id="-">检查扩展支持</h3>
+<p>如果你看一下<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/vkCreateInstance.html"><code>vkCreateInstance</code></a>文档，那么你会看到可能的错误代码之一是<code>VK_ERROR_EXTENSION_NOT_PRESENT</code>。我们可以简单地指定我们需要的扩展，如果错误代码出现就终止。这对于像窗口系统接口这样的基本扩展是有意义的，但如果我们想检查可选功能呢？</p>
+<p>为了在创建实例之前检索支持的扩展列表，有一个<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/vkEnumerateInstanceExtensionProperties.html"><code>vkEnumerateInstanceExtensionProperties</code></a>函数。它需要一个存储扩展数量的变量指针和一个<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkExtensionProperties.html"><code>VkExtensionProperties</code></a>的数组来存储扩展的细节。它还需要一个可选的第一个参数，允许我们通过一个特定的验证层来过滤扩展，我们现在将忽略这个参数。</p>
+<p>要分配一个数组来保存扩展的详细信息，我们首先需要知道有多少个。你可以通过将后一个参数留空来请求扩展的数量:</p>
+<pre><code class="lang-c++">uint32_t extensionCount = 0;
+vkEnumerateInstanceExtensionProperties(nullptr, &amp;extensionCount, nullptr);
+</code></pre>
+<p>现在分配一个数组来保存扩展的细节（<code>include</code>）:</p>
+<pre><code class="lang-c++">std::vector&lt;VkExtensionProperties&gt; extensions(extensionCount);
+</code></pre>
+<p>最后，我们可以查询扩展的详细信息:</p>
+<pre><code class="lang-c++">vkEnumerateInstanceExtensionProperties(nullptr, &amp;extensionCount, extensions.data());
+</code></pre>
+<p>每个<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkExtensionProperties.html"><code>VkExtensionProperties</code></a>结构包含一个扩展的名称和版本。我们可以用一个简单的for循环来列出它们（<code>t</code>是一个缩进的制表符）:</p>
+<pre><code class="lang-c++">std::cout &lt;&lt; &quot;available extensions:\n&quot;;
+
+for (const auto&amp; extension : extensions) {
+    std::cout &lt;&lt; &#39;\t&#39; &lt;&lt; extension.extensionName &lt;&lt; &#39;\n&#39;;
+}
+</code></pre>
+<p>如果你想提供一些关于Vulkan支持的细节，你可以在<code>createInstance</code>函数中加入这段代码。作为一个挑战，尝试创建一个函数，检查由<code>glfwGetRequiredInstanceExtensions</code>返回的所有扩展是否包含在支持的扩展列表中。</p>
+<h3 id="cleaning-up">Cleaning up</h3>
+<p><a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/VkInstance.html"><code>VkInstance</code></a>应该只在程序退出前销毁。它可以在<code>cleanup</code>中用<a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/vkDestroyInstance.html"><code>vkDestroyInstance</code></a>函数销毁。</p>
+<pre><code class="lang-c++">void cleanup() {
+    vkDestroyInstance(instance, nullptr);
+
+    glfwDestroyWindow(window);
+
+    glfwTerminate();
+}
+</code></pre>
+<p><a href="https://www.khronos.org/registry/vulkan/specs/1.0/man/html/vkDestroyInstance.html"><code>vkDestroyInstance</code></a>函数的参数是直接的。正如前一章提到的，Vulkan中的分配和去分配函数有一个可选的分配器回调，我们将通过传递<code>nullptr</code>来忽略它。我们将在接下来的章节中创建的所有其他Vulkan资源都应该在实例被销毁之前被清理掉。</p>
+<p>在继续进行实例创建后更复杂的步骤之前，是时候通过检查<a href="https://vulkan-tutorial.com/en/Drawing_a_triangle/Setup/Validation_layers">validation layers</a>来评估我们的调试选项了。</p>
+<p><a href="https://vulkan-tutorial.com/code/01_instance_creation.cpp">C++ code</a></p>
+
+          	</article>
+        </div>
+		</div>
+  </body>
+</html>
+<script type="text/javascript" src="toc/js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="toc/js/jquery.ztree.all-3.5.min.js"></script>
+<script type="text/javascript" src="toc/js/ztree_toc.js"></script>
+<script type="text/javascript" src="toc_conf.js"></script>
+
+<SCRIPT type="text/javascript" >
+<!--
+$(document).ready(function(){
+    var css_conf = eval(markdown_panel_style);
+    $('#readme').css(css_conf)
+    
+    var conf = eval(jquery_ztree_toc_opts);
+		$('#tree').ztree_toc(conf);
+});
+//-->
+</SCRIPT>
